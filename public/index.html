@@ -25,28 +25,36 @@
             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl transition duration-200 shadow-lg shadow-indigo-200">Tizimga Kirish</button>
         </form>
     </div>
+
     <script>
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const errorBox = document.getElementById('error-box');
             errorBox.classList.add('hidden');
 
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: document.getElementById('username').value,
-                    password: document.getElementById('password').value
-                })
-            });
-            const data = await res.json();
-            if(!res.ok) {
-                errorBox.innerText = data.error;
+            try {
+                // Netlify-da serverless API uchun /api/ bilan murojaat qilinadi
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        password: document.getElementById('password').value
+                    })
+                });
+                
+                const data = await res.json();
+                if(!res.ok) {
+                    errorBox.innerText = data.error || "Xatolik yuz berdi";
+                    errorBox.classList.remove('hidden');
+                } else {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data));
+                    window.location.href = '/dashboard.html';
+                }
+            } catch (err) {
+                errorBox.innerText = "Serverga ulanib bo'lmadi. Netlify Environment Variables sozlamalarini tekshiring.";
                 errorBox.classList.remove('hidden');
-            } else {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data));
-                window.location.href = '/dashboard.html';
             }
         });
     </script>

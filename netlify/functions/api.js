@@ -10,10 +10,17 @@ app.use(cors());
 app.use(express.json());
 
 // Neon.tech ulanish sozlamasi
+const { Pool } = require('pg');
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
+
+
+
 
 const JWT_SECRET = process.env.JWT_SECRET || 'smena_maxfiy_kaliti_2026';
 
