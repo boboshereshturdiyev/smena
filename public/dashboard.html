@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boshqaruv Paneli</title>
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+    <!-- Navigatsiya -->
+    <nav class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+        <div>
+            <h1 class="text-xl font-bold text-slate-900">Smena Taqsimot Platformasi</h1>
+            <p id="user-status" class="text-xs text-indigo-600 font-medium"></p>
+        </div>
+        <button onclick="logout()" class="text-sm bg-rose-50 hover:bg-rose-100 text-rose-600 px-4 py-2 rounded-xl font-medium transition">Chiqish</button>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- CHAP QISM: TAQSIMOT PANEL (Faqat vakolatli xodimlar uchun) -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 lg:col-span-1 h-fit">
+            <h3 class="text-lg font-bold mb-4 text-slate-900 border-b pb-2">Kunlik Taqsimot (09:00 - 09:00)</h3>
+            <form id="taqsimot-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Sana</label>
+                    <input type="date" id="sana" required class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div id="superadmin-smena-select" class="hidden">
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Smenani Tanlang</label>
+                    <select id="smena_raqami" class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="1">1-Smena</option>
+                        <option value="2">2-Smena</option>
+                        <option value="3">3-Smena</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Xodim</label>
+                    <select id="xodim" required class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Yo'nalish / Pozitsiya</label>
+                    <select id="yonalish" required class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"></select>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-indigo-100">Biriktirish & Saqlash</button>
+            </form>
+        </section>
+
+        <!-- O'NG QISM: REPORT / HISOBOT PANEL -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b pb-4">
+                <h3 class="text-lg font-bold text-slate-900">Davriy Hisobotlar va Filtr</h3>
+                <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-sm">Excel (CSV) yuklash</button>
+            </div>
+
+            <!-- Filtrlar -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 bg-slate-50 p-4 rounded-xl">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Dan</label>
+                    <input type="date" id="filter-dan" class="w-full p-2 border border-slate-200 rounded-lg text-xs">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Gacha</label>
+                    <input type="date" id="filter-gacha" class="w-full p-2 border border-slate-200 rounded-lg text-xs">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Smena</label>
+                    <select id="filter-smena" class="w-full p-2 border border-slate-200 rounded-lg text-xs">
+                        <option value="">Barchasi</option>
+                        <option value="1">1-Smena</option>
+                        <option value="2">2-Smena</option>
+                        <option value="3">3-Smena</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="loadReports()" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-2 rounded-lg text-xs font-semibold transition">Filtrlash</button>
+                </div>
+            </div>
+
+            <!-- Hisobot Jadvali (Mobile Responsive dynamic cards or desktop table) -->
+            <div class="overflow-x-auto rounded-xl border border-slate-100">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+                            <th class="p-3">Sana</th>
+                            <th class="p-3">Smena</th>
+                            <th class="p-3">Xodim</th>
+                            <th class="p-3">Yo'nalish</th>
+                            <th class="p-3">Kiritdi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hisobot-table-body" class="divide-y divide-slate-100 text-slate-700">
+                        <!-- Ma'lumotlar JS orqali keladi -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
